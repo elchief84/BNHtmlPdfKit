@@ -471,9 +471,10 @@
     
     NSDictionary *dict = nil;
     if(self.password){
+        const char *passwd = [self.password UTF8String];
         dict = CFBridgingRelease(CFDictionaryCreateMutable(NULL, 0, &kCFTypeDictionaryKeyCallBacks, &kCFTypeDictionaryValueCallBacks));
-        CFDictionarySetValue((__bridge CFMutableDictionaryRef)(dict), kCGPDFContextUserPassword, CFSTR(self.password));
-        CFDictionarySetValue((__bridge CFMutableDictionaryRef)(dict), kCGPDFContextOwnerPassword, CFSTR(self.password));
+        CFDictionarySetValue((__bridge CFMutableDictionaryRef)(dict), kCGPDFContextUserPassword, (__bridge const void *)(self.password));
+        CFDictionarySetValue((__bridge CFMutableDictionaryRef)(dict), kCGPDFContextOwnerPassword, (__bridge const void *)(self.password));
     }
 
 	UIGraphicsBeginPDFContextToData(currentReportData, pageRect, dict);
