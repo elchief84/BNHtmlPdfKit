@@ -314,6 +314,15 @@ Saves an html string to a PDF file.
 - (void)saveUrlAsPdf:(NSURL *)url toFile:(NSString *)file;
 
 /**
+ Saves an html string to a PDF file.
+ 
+ @param url The URL to save as a pdf file.
+ @param file The filename of the pdf file to save.
+ @param password The password that protect pdf file.
+ */
+- (void)saveUrlAsPdf:(NSURL *)url toFile:(NSString *)file withPassword:(NSString *)password;
+
+/**
 Saves an webView to PDF data.
 
 @param webView The webView to save as a pdf.

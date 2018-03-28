@@ -46,6 +46,7 @@
 - (void)_savePdf;
 
 @property (nonatomic, copy) NSString *outputFile;
+@property (nonatomic, copy) NSString *password;
 @property (nonatomic, strong) UIWebView *webView;
 
 @property (nonatomic, copy) void (^dataCompletionBlock)(NSData *pdfData);
@@ -386,6 +387,20 @@
 	[self.webView loadRequest:[NSURLRequest requestWithURL:url]];
 }
 
+- (void)saveUrlAsPdf:(NSURL *)url toFile:(NSString *)file withPassword:(NSString *)password{
+    self.outputFile = file;
+    self.password = password;
+    
+    self.webView = [[UIWebView alloc] init];
+    self.webView.delegate = self;
+    
+    if ([self.webView respondsToSelector:@selector(setSuppressesIncrementalRendering:)]) {
+        [self.webView setSuppressesIncrementalRendering:YES];
+    }
+    
+    [self.webView loadRequest:[NSURLRequest requestWithURL:url]];
+}
+
 - (void)saveWebViewAsPdf:(UIWebView *)webView {
 	[self saveWebViewAsPdf:webView toFile:nil];
 }
@@ -399,6 +414,7 @@
 
 	self.webView = webView;
 }
+
 
 #pragma mark - UIWebViewDelegate
 
@@ -452,8 +468,15 @@
 
 	CGSize pageSize = [self actualPageSize];
 	CGRect pageRect = CGRectMake(0, 0, pageSize.width, pageSize.height);
+    
+    NSDictionary *dict = nil;
+    if(self.password){
+        dict = CFBridgingRelease(CFDictionaryCreateMutable(NULL, 0, &kCFTypeDictionaryKeyCallBacks, &kCFTypeDictionaryValueCallBacks));
+        CFDictionarySetValue((__bridge CFMutableDictionaryRef)(myDictionary), kCGPDFContextUserPassword, CFSTR([self.password UTF8String]));
+        CFDictionarySetValue((__bridge CFMutableDictionaryRef)(myDictionary), kCGPDFContextOwnerPassword, CFSTR([self.password UTF8String]));
+    }
 
-	UIGraphicsBeginPDFContextToData(currentReportData, pageRect, nil);
+	UIGraphicsBeginPDFContextToData(currentReportData, pageRect, dict);
 
 	[renderer prepareForDrawingPages:NSMakeRange(0, 1)];
 
